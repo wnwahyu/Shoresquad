@@ -10,8 +10,10 @@ const CONFIG = {
     animationDuration: 300,
     scrollThreshold: 100,
     counterSpeed: 2000,
-    weatherApiKey: 'YOUR_OPENWEATHERMAP_API_KEY', // Replace with actual key
-    mapCenter: [40.7128, -74.0060], // NYC coordinates - update as needed
+    // NEA Singapore APIs from data.gov.sg
+    neaWeatherApi: 'https://api-open.data.gov.sg/v2/real-time/api/twenty-four-hr-forecast',
+    neaAirTempApi: 'https://api-open.data.gov.sg/v2/real-time/api/air-temperature',
+    weatherUpdateInterval: 1800000, // Update every 30 minutes
 };
 
 // ============================================
@@ -29,6 +31,8 @@ const DOM = {
     successMessage: document.getElementById('successMessage'),
     eventsContainer: document.getElementById('eventsContainer'),
     eventsLoader: document.getElementById('eventsLoader'),
+    currentConditions: document.getElementById('currentConditions'),
+    forecastContainer: document.getElementById('forecastContainer'),
 };
 
 // ============================================
@@ -347,6 +351,215 @@ function showFormError(message) {
 }
 
 // ============================================
+// Weather Functions - NEA Singapore API
+// ============================================
+
+/**
+ * Get weather icon based on forecast
+ * @param {string} forecast - Forecast description
+ * @returns {string} - Emoji icon
+ */
+function getWeatherIcon(forecast) {
+    const forecastLower = forecast.toLowerCase();
+    if (forecastLower.includes('thunder') || forecastLower.includes('storm')) return '⛈️';
+    if (forecastLower.includes('rain') || forecastLower.includes('shower')) return '🌧️';
+    if (forecastLower.includes('cloudy')) return '☁️';
+    if (forecastLower.includes('partly cloudy') || forecastLower.includes('fair')) return '⛅';
+    if (forecastLower.includes('hazy')) return '🌫️';
+    if (forecastLower.includes('windy')) return '💨';
+    return '☀️'; // Default sunny
+}
+
+/**
+ * Fetch current air temperature from NEA
+ * @returns {Promise<Object>} - Temperature data
+ */
+async function fetchCurrentTemperature() {
+    try {
+        const response = await fetch(CONFIG.neaAirTempApi);
+        if (!response.ok) throw new Error('Failed to fetch temperature');
+        const data = await response.json();
+        
+        // Get readings from stations (average them)
+        const readings = data.data.readings;
+        if (readings && readings.length > 0) {
+            const temps = readings.map(r => r.value);
+            const avgTemp = temps.reduce((a, b) => a + b, 0) / temps.length;
+            return {
+                temperature: avgTemp.toFixed(1),
+                timestamp: data.data.timestamp
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error('Error fetching temperature:', error);
+        return null;
+    }
+}
+
+/**
+ * Fetch 24-hour weather forecast from NEA
+ * @returns {Promise<Object>} - Forecast data
+ */
+async function fetchWeatherForecast() {
+    try {
+        const response = await fetch(CONFIG.neaWeatherApi);
+        if (!response.ok) throw new Error('Failed to fetch forecast');
+        const data = await response.json();
+        return data.data;
+    } catch (error) {
+        console.error('Error fetching forecast:', error);
+        return null;
+    }
+}
+
+/**
+ * Load and display weather data
+ */
+async function loadWeather() {
+    try {
+        // Fetch both temperature and forecast
+        const [tempData, forecastData] = await Promise.all([
+            fetchCurrentTemperature(),
+            fetchWeatherForecast()
+        ]);
+
+        if (forecastData) {
+            renderCurrentConditions(tempData, forecastData);
+            renderForecast(forecastData);
+        } else {
+            showWeatherError();
+        }
+    } catch (error) {
+        console.error('Error loading weather:', error);
+        showWeatherError();
+    }
+}
+
+/**
+ * Render current weather conditions
+ * @param {Object} tempData - Temperature data
+ * @param {Object} forecastData - Forecast data
+ */
+function renderCurrentConditions(tempData, forecastData) {
+    if (!DOM.currentConditions) return;
+
+    const periods = forecastData.records[0].periods;
+    const currentPeriod = periods[0]; // Get first period (usually current/today)
+    
+    const temp = tempData ? tempData.temperature : '--';
+    const forecast = currentPeriod.regions.national || currentPeriod.text || 'Fair';
+    
+    const html = `
+        <div class="current-location">Singapore</div>
+        <div class="forecast-icon">${getWeatherIcon(forecast)}</div>
+        <div class="current-temp">${temp}°C</div>
+        <div class="current-description">${forecast}</div>
+        <div class="weather-details">
+            <div class="weather-detail-item">
+                <span class="weather-detail-label">Humidity</span>
+                <span class="weather-detail-value">${currentPeriod.regions.humidity?.high || '--'}%</span>
+            </div>
+            <div class="weather-detail-item">
+                <span class="weather-detail-label">Wind</span>
+                <span class="weather-detail-value">${currentPeriod.wind?.direction || 'Variable'}</span>
+            </div>
+        </div>
+    `;
+    
+    DOM.currentConditions.innerHTML = html;
+}
+
+/**
+ * Render 4-day forecast
+ * @param {Object} forecastData - Forecast data from NEA
+ */
+function renderForecast(forecastData) {
+    if (!DOM.forecastContainer) return;
+
+    const records = forecastData.records[0];
+    const periods = records.periods;
+    
+    // Create 4-day forecast by grouping periods
+    const forecastDays = createForecastDays(periods);
+    
+    const forecastHTML = forecastDays.map((day, index) => {
+        const isToday = index === 0;
+        return `
+            <div class="forecast-card ${isToday ? 'today' : ''}">
+                <div class="forecast-day">${day.dayName}</div>
+                <div class="forecast-date">${day.date}</div>
+                <div class="forecast-icon">${getWeatherIcon(day.forecast)}</div>
+                <div class="forecast-temp">${day.tempHigh}°C</div>
+                <div class="forecast-temp-range">${day.tempLow}°C - ${day.tempHigh}°C</div>
+                <div class="forecast-description">${day.forecast}</div>
+                <div class="forecast-details">
+                    <div class="forecast-detail">
+                        <span class="forecast-detail-icon">💧</span>
+                        <span class="forecast-detail-value">${day.humidity}%</span>
+                    </div>
+                    <div class="forecast-detail">
+                        <span class="forecast-detail-icon">💨</span>
+                        <span class="forecast-detail-value">${day.wind}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    DOM.forecastContainer.innerHTML = forecastHTML;
+}
+
+/**
+ * Create 4-day forecast from periods
+ * @param {Array} periods - Forecast periods
+ * @returns {Array} - Array of daily forecasts
+ */
+function createForecastDays(periods) {
+    const days = [];
+    const today = new Date();
+    
+    // Get 4 days of forecast
+    for (let i = 0; i < 4; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        
+        // Find matching period or use general forecast
+        const period = periods[i] || periods[0];
+        const forecast = period.regions?.national || period.text || 'Fair';
+        
+        days.push({
+            dayName: i === 0 ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'long' }),
+            date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            forecast: forecast,
+            tempLow: period.temperature?.low || 24,
+            tempHigh: period.temperature?.high || 32,
+            humidity: period.regions?.humidity?.high || 85,
+            wind: period.wind?.direction || 'Light'
+        });
+    }
+    
+    return days;
+}
+
+/**
+ * Show weather error message
+ */
+function showWeatherError() {
+    if (DOM.currentConditions) {
+        DOM.currentConditions.innerHTML = `
+            <div class="weather-alert">
+                <div class="weather-alert-title">⚠️ Unable to load weather data</div>
+                <div class="weather-alert-text">Please check your connection and try again later.</div>
+            </div>
+        `;
+    }
+    if (DOM.forecastContainer) {
+        DOM.forecastContainer.innerHTML = '';
+    }
+}
+
+// ============================================
 // Events Data & Loading
 // ============================================
 
@@ -596,6 +809,12 @@ function init() {
     
     // Initialize Intersection Observer for animations
     observeElements();
+    
+    // Load weather data
+    loadWeather();
+    
+    // Update weather periodically
+    setInterval(loadWeather, CONFIG.weatherUpdateInterval);
     
     // Load events
     loadEvents();

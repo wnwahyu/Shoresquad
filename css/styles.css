@@ -471,6 +471,194 @@ ul {
 }
 
 /* ============================================
+   Weather Section
+   ============================================ */
+.weather-section {
+    background: linear-gradient(135deg, #E0F2FE 0%, #F0FDFA 100%);
+}
+
+.weather-info {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.current-conditions {
+    background-color: var(--color-white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+.current-temp {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    font-family: var(--font-primary);
+    margin: var(--spacing-md) 0;
+}
+
+.current-location {
+    font-size: var(--text-xl);
+    color: var(--color-gray-dark);
+    margin-bottom: var(--spacing-sm);
+}
+
+.current-description {
+    font-size: var(--text-lg);
+    color: var(--color-gray);
+    text-transform: capitalize;
+}
+
+.weather-details {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-xl);
+    margin-top: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.weather-detail-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.weather-detail-label {
+    font-size: var(--text-sm);
+    color: var(--color-gray);
+}
+
+.weather-detail-value {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-dark);
+}
+
+.forecast-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.forecast-card {
+    background-color: var(--color-white);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.forecast-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.forecast-card.today {
+    border: 2px solid var(--color-primary);
+    background: linear-gradient(135deg, rgba(8, 145, 178, 0.05), rgba(20, 184, 166, 0.05));
+}
+
+.forecast-day {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-dark);
+    margin-bottom: var(--spacing-sm);
+}
+
+.forecast-date {
+    font-size: var(--text-sm);
+    color: var(--color-gray);
+    margin-bottom: var(--spacing-md);
+}
+
+.forecast-icon {
+    font-size: 3rem;
+    margin: var(--spacing-md) 0;
+}
+
+.forecast-temp {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: var(--spacing-sm) 0;
+}
+
+.forecast-temp-range {
+    font-size: var(--text-sm);
+    color: var(--color-gray);
+}
+
+.forecast-description {
+    font-size: var(--text-sm);
+    color: var(--color-gray-dark);
+    margin-top: var(--spacing-sm);
+    text-transform: capitalize;
+}
+
+.forecast-details {
+    display: flex;
+    justify-content: space-around;
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-gray-light);
+}
+
+.forecast-detail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.forecast-detail-icon {
+    font-size: var(--text-lg);
+}
+
+.forecast-detail-value {
+    font-size: var(--text-xs);
+    color: var(--color-gray);
+}
+
+.weather-source {
+    text-align: center;
+    margin-top: var(--spacing-xl);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--color-gray-light);
+}
+
+.weather-source p {
+    font-size: var(--text-sm);
+    color: var(--color-gray);
+}
+
+.weather-source a {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.weather-alert {
+    background-color: rgba(249, 115, 22, 0.1);
+    border-left: 4px solid var(--color-accent);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-top: var(--spacing-lg);
+}
+
+.weather-alert-title {
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-bottom: var(--spacing-xs);
+}
+
+.weather-alert-text {
+    font-size: var(--text-sm);
+    color: var(--color-gray-dark);
+}
+
+/* ============================================
    Features Section
    ============================================ */
 .features-grid {
