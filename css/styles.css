@@ -509,6 +509,58 @@ ul {
 /* ============================================
    Events Section
    ============================================ */
+.next-cleanup-map {
+    background-color: var(--color-white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    margin-bottom: var(--spacing-3xl);
+}
+
+.map-title {
+    font-size: var(--text-2xl);
+    color: var(--color-dark);
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+}
+
+.map-container {
+    margin-bottom: var(--spacing-lg);
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.map-container iframe {
+    display: block;
+    width: 100%;
+}
+
+.map-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg);
+    background: linear-gradient(135deg, rgba(8, 145, 178, 0.1), rgba(20, 184, 166, 0.1));
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.map-info p {
+    margin: 0;
+    color: var(--color-gray-dark);
+    font-size: var(--text-base);
+}
+
+.map-info strong {
+    color: var(--color-dark);
+}
+
+.map-info .btn {
+    margin-top: var(--spacing-md);
+    align-self: center;
+}
+
 .events-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
