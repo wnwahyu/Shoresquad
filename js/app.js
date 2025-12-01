@@ -642,25 +642,25 @@ function showWeatherError() {
 const mockEvents = [
     {
         id: 1,
-        title: 'Sunset Beach Cleanup',
+        title: 'Pasir Ris Beach Cleanup',
         date: '2025-12-05',
-        location: 'Santa Monica Beach, CA',
+        location: 'Pasir Ris Beach, Singapore',
         attendees: 24,
         weather: 'sunny'
     },
     {
         id: 2,
-        title: 'Weekend Wave Warriors',
+        title: 'East Coast Park Warriors',
         date: '2025-12-07',
-        location: 'Bondi Beach, Australia',
+        location: 'East Coast Park, Singapore',
         attendees: 18,
         weather: 'partly-cloudy'
     },
     {
         id: 3,
-        title: 'Coastal Cleanup Crew',
+        title: 'Sentosa Beach Cleanup',
         date: '2025-12-08',
-        location: 'Miami Beach, FL',
+        location: 'Siloso Beach, Sentosa',
         attendees: 32,
         weather: 'sunny'
     }
